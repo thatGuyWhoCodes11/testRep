@@ -1,9 +1,10 @@
 const express=require('express');
-const db=require('/Works/Web development/Sending datas to backend/database/database.js');
+const db=require('./database/database.js');
 const app=express();
 let name="";
 app.set("view engine","ejs");
-app.use(express.json(),express.urlencoded({extended:true})); 
+app.use(express.json(),express.urlencoded({extended:true}));
+app.use('/javascript',express.static(__dirname+'/javascript')) 
 app.listen(3000,()=>{
     console.log("started");
 })
@@ -14,7 +15,7 @@ app.get('/',(req,res)=>{
 app.post('/sendata',(req,res)=>{
     const data=req.body;
     name=data.user; 
-    db.log_var.insertMany({username:data.user,password:data.pass});
+    db.log_var.insertMany({username:data.user,password:data.pass,list:['']});
     res.send('Sucess');
 })
 
@@ -23,11 +24,8 @@ app.get('/find',(req,res)=>{
 })
 
 app.post('/details',(req,res)=>{
-    const data = req.body;
-    console.log(data);
-    db.log_var.findOne({username:data.user}).then((doc)=>{
-        res.send(doc.password);
-    })
+    const data=req.body
+    db.log_var.findOneAndUpdate({username:name},{$set:{list:data.list}})
 })
 
 app.get('/list',(req,res)=>{
@@ -37,3 +35,6 @@ app.get('/list',(req,res)=>{
     })
 })
 
+app.get('/fuckingTodo',(req,res)=>{
+    res.sendFile(__dirname+'/pages/todo.html')
+})
